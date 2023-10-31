@@ -1,0 +1,10 @@
+{
+    "scripts": {
+        "docker-start": "cls && docker-compose up -d --build && docker logs --tail 1000 --follow RivagesPropres-app --details",
+        "docker-stop": "cls && docker-compose down",
+        "app-scripts": "cls && docker exec -it RivagesPropres-app bash",
+        "run-watch":"cls && docker exec -it RivagesPropres-app sh -c ./runwatch.sh",
+        "check-secu":"cls && docker exec -it RivagesPropres-app sh -c \"symfony check:security\"",
+        "check-code":"cls && docker exec -it RivagesPropres-app bash -c \"./vendor/bin/phpcs -v --standard=PSR12 --ignore=./src/Kernel.php ./src\""
+    }
+}

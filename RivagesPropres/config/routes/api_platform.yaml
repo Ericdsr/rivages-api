@@ -1,0 +1,12 @@
+api_platform:
+    resource: .
+    type: api_platform
+    prefix: /api
+app_articles_delete:
+    path: /articles/{id}
+    controller: App\Controller\ArticlesController:delete
+    methods: DELETE
+app_articles_update:
+    path: /articles/{id}
+    methods: [PUT]
+    controller: App\Controller\ArticlesController::update
