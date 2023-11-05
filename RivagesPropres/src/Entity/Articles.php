@@ -65,12 +65,13 @@ class Articles
         }
         return null;
     }
-    public function setImage(?MediaObject $image): void
-    {
-        $this->image = $image;
-    }
     public function getImage(): ?MediaObject
     {
         return $this->image;
+    }
+
+    public function setImage(?MediaObject $image): void
+    {
+        $this->image = $image;
     }
 }

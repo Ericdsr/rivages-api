@@ -29,77 +29,44 @@ class ArticlesController extends AbstractController
     {
         $entityManager = $this->doctrine;
     
+        // Supprime l'image associée à l'article s'il en a une
         $image = $article->image;
         if ($image) {
-            $entityManager->remove($image); 
+            $entityManager->remove($image); // Supprime l'objet MediaObject associé
             $entityManager->flush();
         }
     
+        // Supprime l'article
         $entityManager->remove($article);
         $entityManager->flush();
     
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
-    private function uploadImage(MediaObject $file): MediaObject
-    {
-        $entityManager = $this->doctrine;
-    
-        // Create a new MediaObject
-        $image = new MediaObject();
-    
-        // Upload the image
-        $image->setFile($$file);
-        $entityManager->persist($image);
-        $entityManager->flush();
-    
-        // Return the MediaObject
-        return $image;
-    }
-    
-
     public function update(Articles $article, Request $request): Response
 {
     $entityManager = $this->doctrine;
 
-    // Create a form builder
-    $formBuilder = $this->createFormBuilder();
+    // Mettre à jour l'article
+    $article->setTitle($request->get('title'));
+    $article->setParagraph($request->get('paragraph'));
 
-    // Add the form fields to the builder
-    $formBuilder
-        ->add('title', TextType::class)
-        ->add('paragraph', TextType::class)
-        ->add('image', FileType::class, [
-            'required' => false,
-        ]);
+    // Si une image est envoyée avec la requête, la télécharger et l'associer à l'article
+    $image = $request->files->get('image');
+    if ($image) {
+        $mediaObject = new MediaObject();
+        $mediaObject->setFile($image);
 
-    // Build the form
-    $form = $formBuilder->getForm();
+        $entityManager->persist($mediaObject);
 
-    // Submit the form to the controller
-    $form->handleRequest($request);
-
-    // If the form is valid, then update the article
-    if ($form->isValid()) {
-        $article->setTitle($form->get('title')->getData());
-        $article->setParagraph($form->get('paragraph')->getData());
-
-        // Get the image file from the form
-        $imageFile = $form->get('image')->getData();
-
-        // If an image file is present, then upload the image and update the article's image property
-        if ($imageFile) {
-            $image = $this->uploadImage($imageFile);
-            $article->setImage($image);
-        }
-
-        // Save the article
-        $entityManager->persist($article);
-        $entityManager->flush();
-
-        // Return a success response
-        return $this->json($article, Response::HTTP_OK);
+        $article->setImage($mediaObject);
     }
+
+    // Enregistrer l'article en base de données
+    $entityManager->flush();
+
+    // Retourner une réponse HTTP 200 OK avec l'objet Articles mis à jour dans le corps de la réponse
+    return $this->json($article, Response::HTTP_OK);
 }
 
-      
+
 }
